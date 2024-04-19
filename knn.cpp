@@ -13,7 +13,7 @@ struct Point
 };
 
 static int64_t 
-PointClassification(std::vector<Point>& points, int k, const Point& p)
+PointClassification(std::vector<Point>& points, size_t k, const Point& p)
 {
     for (auto& point : points)
     {
@@ -26,13 +26,15 @@ PointClassification(std::vector<Point>& points, int k, const Point& p)
         });
 
     std::vector<int> frequency_count(3, 0); // Number of groups
-    for (auto& point : std::ranges::subrange(points.begin(), points.begin() + k))
+    std::span<Point> point_span{ points.data(), std::min(k, points.size()) };
+    for (auto& point : point_span)
     {
         if (point.val < frequency_count.size())
         {
             ++frequency_count[point.val];
         }
     }
+
 
     auto max_iterator = std::ranges::max_element(frequency_count);
     return std::distance(frequency_count.begin(), max_iterator);
@@ -75,7 +77,7 @@ int main()
     std::cout << "Enter x and y coordinates of the point to classify: ";
     std::cin >> p.x >> p.y;
 
-    int k;
+    size_t k;
     std::cout << "Enter the number of nearest neighbours to consider: ";
     std::cin >> k;
 
